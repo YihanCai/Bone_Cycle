@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bone Cycle - 火柴人自行车闯关游戏</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      background: #1a1a2e;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: 'Microsoft YaHei', sans-serif;
+      color: #ffffff;
+    }
+    
+    #gameContainer {
+      position: relative;
+      text-align: center;
+    }
+    
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2.5em;
+      color: #e94560;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    
+    canvas {
+      border: 3px solid #e94560;
+      border-radius: 10px;
+      box-shadow: 0 0 30px rgba(233, 69, 96, 0.5);
+      background: #16213e;
+    }
+    
+    #ui {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      text-align: right;
+      font-size: 16px;
+      pointer-events: none;
+      z-index: 10;
+    }
+    
+    #ui div {
+      margin-bottom: 10px;
+      padding: 5px 10px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 5px;
+    }
+    
+    #controls {
+      margin-top: 20px;
+      color: #aaa;
+      font-size: 14px;
+    }
+    
+    #controls span {
+      display: inline-block;
+      margin: 0 10px;
+      padding: 5px 10px;
+      background: #2d3748;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div id="gameContainer">
+    <h1>🚴 Bone Cycle</h1>
+    <canvas id="gameCanvas" width="1000" height="600"></canvas>
+    <div id="ui">
+      <div id="score">分数: 0</div>
+      <div id="lives">生命: ❤️❤️❤️</div>
+    </div>
+    <div id="controls">
+      <span>D: 前进</span>
+      <span>A: 倒车</span>
+      <span>S: 停止</span>
+      <span>空格: 跳跃</span>
+      <span>R: 重来</span>
+      <span>ESC: 暂停</span>
+    </div>
+  </div>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

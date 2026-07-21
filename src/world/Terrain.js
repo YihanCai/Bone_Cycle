@@ -49,8 +49,8 @@ export class Terrain {
    * 渲染地形
    */
   render() {
-    // 清空画布背景
-    this.ctx.fillStyle = '#16213e';
+    // 清空画布背景（天空蓝）
+    this.ctx.fillStyle = '#87CEEB';
     this.ctx.fillRect(0, 0, this.width, this.height);
     
     // 绘制平台

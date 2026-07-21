@@ -8,6 +8,10 @@ import { Player } from '../entities/Player.js';
 import { Bicycle } from '../entities/Bicycle.js';
 import { Physics } from '../physics/Physics.js';
 import level1Data from '../../assets/levels/level1.json';
+import level2Data from '../../assets/levels/level2.json';
+
+// 关卡列表
+const levels = [level1Data, level2Data];
 
 // 游戏状态枚举
 export const GameState = {
@@ -15,7 +19,8 @@ export const GameState = {
   PLAYING: 'playing',
   PAUSED: 'paused',
   GAME_OVER: 'game_over',
-  VICTORY: 'victory'
+  VICTORY: 'victory',
+  GAME_COMPLETE: 'game_complete'
 };
 
 export class Game {
@@ -29,6 +34,10 @@ export class Game {
     this.gameState = GameState.MENU;
     this.score = 0;
     this.lives = 3;
+    
+    // 关卡系统
+    this.currentLevel = 0;
+    this.totalLevels = levels.length;
     
     // 时间管理
     this.lastTime = 0;
@@ -87,9 +96,13 @@ export class Game {
       }
       
       // 在游戏结束或胜利状态时，按R重新开始
-      if (this.gameState === GameState.GAME_OVER || this.gameState === GameState.VICTORY) {
+      if (this.gameState === GameState.GAME_OVER || this.gameState === GameState.VICTORY || this.gameState === GameState.GAME_COMPLETE) {
         if (keyCode === 'KeyR') {
           this.restart();
+        }
+        // 通关后按空格/Enter进入下一关
+        if (this.gameState === GameState.VICTORY && (keyCode === 'Space' || keyCode === 'Enter')) {
+          this.nextLevel();
         }
       }
     });
@@ -107,10 +120,11 @@ export class Game {
     this.bikeColor = bikeColor;
     this.score = 0;
     this.lives = 3;
-    this.maxDistance = 0; // 最远距离（用于计分）
+    this.maxDistance = 0;
+    this.currentLevel = 0;
     
-    // 加载第一关
-    this.terrain.loadLevel(level1Data);
+    // 加载当前关卡
+    this.loadCurrentLevel();
     
     // 获取玩家起始位置
     const startPos = this.terrain.getStartPosition();
@@ -127,6 +141,39 @@ export class Game {
     
     // 初始化物理引擎的安全位置
     this.physics.setSafePosition(startPos.x, startPos.y);
+  }
+
+  loadCurrentLevel() {
+    const levelData = levels[this.currentLevel];
+    this.terrain.loadLevel(levelData);
+    
+    // 获取玩家起始位置
+    const startPos = this.terrain.getStartPosition();
+    this.player.setPosition(startPos.x, startPos.y);
+    this.player.setColor(this.playerColor);
+    this.player.velocityX = 0;
+    this.player.velocityY = 0;
+    this.player.isGrounded = true;
+    
+    // 设置自行车位置和颜色
+    this.bicycle.setPosition(startPos.x, startPos.y - 12);
+    this.bicycle.setColor(this.bikeColor);
+    this.bicycle.setSpeed(0);
+    
+    // 初始化物理引擎的安全位置
+    this.physics.setSafePosition(startPos.x, startPos.y);
+  }
+
+  nextLevel() {
+    this.currentLevel++;
+    if (this.currentLevel >= levels.length) {
+      // 所有关卡通关
+      this.gameState = GameState.GAME_COMPLETE;
+    } else {
+      // 进入下一关，保持生命值
+      this.gameState = GameState.PLAYING;
+      this.loadCurrentLevel();
+    }
   }
 
   gameLoop(currentTime) {
@@ -225,6 +272,11 @@ export class Game {
         this.renderGame();
         this.renderVictoryOverlay();
         break;
+        
+      case GameState.GAME_COMPLETE:
+        this.renderGame();
+        this.renderGameCompleteOverlay();
+        break;
     }
     
     // 显示FPS（所有状态都显示）
@@ -292,16 +344,47 @@ export class Game {
     this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
     this.ctx.fillRect(0, 0, this.width, this.height);
     
-    // 胜利文字
+    // 关卡名称
+    const levelName = levels[this.currentLevel]?.name || `第${this.currentLevel + 1}关`;
+    
+    // 标题
     this.ctx.fillStyle = '#ffd700';
     this.ctx.font = 'bold 48px Arial';
     this.ctx.textAlign = 'center';
-    this.ctx.fillText('恭喜通关！', this.width / 2, this.height / 2 - 20);
+    this.ctx.fillText(`${levelName} 通关！`, this.width / 2, this.height / 2 - 50);
     
+    // 得分
     this.ctx.font = '20px Arial';
     this.ctx.fillStyle = '#ffffff';
-    this.ctx.fillText(`最终得分: ${this.score}`, this.width / 2, this.height / 2 + 20);
-    this.ctx.fillText('按R重新开始', this.width / 2, this.height / 2 + 50);
+    this.ctx.fillText(`得分: ${this.score}`, this.width / 2, this.height / 2);
+    
+    // 提示
+    this.ctx.fillStyle = '#4ecdc4';
+    this.ctx.fillText('按 空格/Enter 进入下一关', this.width / 2, this.height / 2 + 40);
+    this.ctx.fillStyle = '#aaaaaa';
+    this.ctx.fillText('按 R 重新开始', this.width / 2, this.height / 2 + 70);
+    this.ctx.textAlign = 'left';
+  }
+  
+  renderGameCompleteOverlay() {
+    // 半透明遮罩
+    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    this.ctx.fillRect(0, 0, this.width, this.height);
+    
+    // 恭喜文字
+    this.ctx.fillStyle = '#ffd700';
+    this.ctx.font = 'bold 48px Arial';
+    this.ctx.textAlign = 'center';
+    this.ctx.fillText('🎉 恭喜通关全部关卡！', this.width / 2, this.height / 2 - 50);
+    
+    // 得分
+    this.ctx.font = '24px Arial';
+    this.ctx.fillStyle = '#ffffff';
+    this.ctx.fillText(`最终得分: ${this.score}`, this.width / 2, this.height / 2);
+    
+    this.ctx.fillStyle = '#aaaaaa';
+    this.ctx.font = '20px Arial';
+    this.ctx.fillText('按 R 重新开始', this.width / 2, this.height / 2 + 50);
     this.ctx.textAlign = 'left';
   }
 
@@ -309,6 +392,7 @@ export class Game {
     // 更新UI显示
     document.getElementById('score').textContent = `分数: ${this.score}`;
     document.getElementById('lives').textContent = `生命: ${'❤️'.repeat(this.lives)}`;
+    document.getElementById('level').textContent = `关卡: ${this.currentLevel + 1}/${this.totalLevels}`;
   }
 
   togglePause() {
@@ -324,11 +408,12 @@ export class Game {
     this.score = 0;
     this.maxDistance = 0;
     this.lives = 3;
+    this.currentLevel = 0;
     this.playerColor = '#ffffff';
     this.bikeColor = '#0f3460';
     
     // 重置地形
-    this.terrain.loadLevel(level1Data);
+    this.terrain.loadLevel(levels[0]);
     
     // 重置玩家
     this.player.setPosition(100, 350);

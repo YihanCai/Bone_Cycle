@@ -1,0 +1,133 @@
+{
+  "name": "第二关：山地骑行",
+  "length": 4000,
+  "platforms": [
+    {
+      "x": 0,
+      "y": 400,
+      "width": 400,
+      "height": 200,
+      "type": "normal"
+    },
+    {
+      "x": 500,
+      "y": 380,
+      "width": 300,
+      "height": 220,
+      "type": "normal"
+    },
+    {
+      "x": 900,
+      "y": 350,
+      "width": 200,
+      "height": 250,
+      "type": "high"
+    },
+    {
+      "x": 1200,
+      "y": 400,
+      "width": 250,
+      "height": 200,
+      "type": "normal"
+    },
+    {
+      "x": 1550,
+      "y": 320,
+      "width": 200,
+      "height": 280,
+      "type": "high"
+    },
+    {
+      "x": 1850,
+      "y": 380,
+      "width": 300,
+      "height": 220,
+      "type": "normal"
+    },
+    {
+      "x": 2250,
+      "y": 350,
+      "width": 200,
+      "height": 250,
+      "type": "high"
+    },
+    {
+      "x": 2550,
+      "y": 400,
+      "width": 250,
+      "height": 200,
+      "type": "normal"
+    },
+    {
+      "x": 2900,
+      "y": 300,
+      "width": 200,
+      "height": 300,
+      "type": "high"
+    },
+    {
+      "x": 3200,
+      "y": 380,
+      "width": 300,
+      "height": 220,
+      "type": "normal"
+    },
+    {
+      "x": 3600,
+      "y": 400,
+      "width": 400,
+      "height": 200,
+      "type": "normal"
+    }
+  ],
+  "gaps": [
+    {
+      "x": 400,
+      "width": 100
+    },
+    {
+      "x": 800,
+      "width": 100
+    },
+    {
+      "x": 1100,
+      "width": 100
+    },
+    {
+      "x": 1450,
+      "width": 100
+    },
+    {
+      "x": 1750,
+      "width": 100
+    },
+    {
+      "x": 2150,
+      "width": 100
+    },
+    {
+      "x": 2450,
+      "width": 100
+    },
+    {
+      "x": 2800,
+      "width": 100
+    },
+    {
+      "x": 3100,
+      "width": 100
+    },
+    {
+      "x": 3500,
+      "width": 100
+    }
+  ],
+  "start": {
+    "x": 50,
+    "y": 350
+  },
+  "end": {
+    "x": 3900,
+    "y": 350
+  }
+}

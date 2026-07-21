@@ -223,18 +223,17 @@ export class Game {
       }
     }
     
-    // 检查火焰碰撞（碰到火焰 = 掉坑效果）
-    if (this.terrain.checkFlameCollision(this.player.x, this.player.y, this.player.width, this.player.height)) {
-      this.player.x = this.physics.lastSafeX;
-      this.player.y = this.physics.lastSafeY;
-      this.player.velocityX = 0;
-      this.player.velocityY = 0;
-      this.player.isGrounded = true;
+    // 检查火焰碰撞（碰到火焰 = 变红闪烁 + 扣血，不传送）
+    if (!this.player.invincible && this.terrain.checkFlameCollision(this.player.x, this.player.y, this.player.width, this.player.height)) {
+      this.player.takeDamage();
       this.lives--;
       if (this.lives <= 0) {
         this.gameState = GameState.GAME_OVER;
       }
     }
+    
+    // 更新玩家状态（含无敌闪烁计时）
+    this.player.update(deltaTime);
     
     // 更新自行车位置 - 轮子底部贴地：wheel center = player.y - wheelRadius
     this.bicycle.setPosition(this.player.x, this.player.y - 12);

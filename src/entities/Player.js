@@ -37,6 +37,12 @@ export class Player {
     
     // 踏板角度（从自行车同步）
     this.pedalAngle = 0;
+    
+    // 受伤闪烁状态
+    this.invincible = false;
+    this.invincibleTimer = 0;
+    this.invincibleDuration = 1.5; // 无敌持续时间（秒）
+    this.flashTimer = 0;
   }
 
   /**
@@ -79,6 +85,25 @@ export class Player {
     } else {
       this.isJumping = false;
     }
+    
+    // 更新无敌闪烁
+    if (this.invincible) {
+      this.invincibleTimer -= deltaTime;
+      this.flashTimer += deltaTime;
+      if (this.invincibleTimer <= 0) {
+        this.invincible = false;
+        this.flashTimer = 0;
+      }
+    }
+  }
+
+  /**
+   * 触发受伤效果（变红闪烁 + 短暂无敌）
+   */
+  takeDamage() {
+    this.invincible = true;
+    this.invincibleTimer = this.invincibleDuration;
+    this.flashTimer = 0;
   }
 
   /**
@@ -95,8 +120,25 @@ export class Player {
       this.ctx.scale(-1, 1);
     }
     
-    // 绘制火柴人
-    this.drawStickman();
+    // 受伤闪烁效果：交替显示红色/透明
+    if (this.invincible) {
+      // 每0.12秒切换一次，快速闪烁
+      const visible = Math.floor(this.flashTimer / 0.12) % 2 === 0;
+      if (visible) {
+        this.ctx.globalAlpha = 0.7;
+        // 临时把颜色改成红色
+        const origColor = this.color;
+        this.color = '#ff2222';
+        this.drawStickman();
+        this.color = origColor;
+      } else {
+        this.ctx.globalAlpha = 0.3;
+        this.drawStickman();
+      }
+    } else {
+      // 绘制火柴人
+      this.drawStickman();
+    }
     
     this.ctx.restore();
   }

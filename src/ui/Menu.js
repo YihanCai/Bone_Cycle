@@ -19,7 +19,8 @@ export class Menu {
     this.bikeColors = [
       { name: '蓝色', color: '#0f3460' },
       { name: '绿色', color: '#4ecdc4' },
-      { name: '橙色', color: '#ff8c42' }
+      { name: '橙色', color: '#ff8c42' },
+      { name: '白色', color: '#ffffff' }
     ];
     
     // 当前选择（默认第一个）

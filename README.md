@@ -52,7 +52,8 @@ npm install
 npm run dev
 ```
 
-浏览器访问https://yihancai.github.io/Bone_Cycle/即可开始游戏！
+浏览器访问https://yihancai.github.io/Bone_Cycle/
+即可开始游戏！
 
 
 ## 项目结构

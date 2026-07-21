@@ -11,6 +11,8 @@ export class Terrain {
     // 地形数据
     this.platforms = [];
     this.gaps = [];
+    this.flames = [];
+    this.flameTimers = [];
     
     // 关卡长度
     this.levelLength = 0;
@@ -32,7 +34,13 @@ export class Terrain {
   loadLevel(levelData) {
     this.platforms = levelData.platforms || [];
     this.gaps = levelData.gaps || [];
+    this.flames = levelData.flames || [];
     this.levelLength = levelData.length || 3000;
+    // 初始化每个火焰的计时器
+    this.flameTimers = this.flames.map((f, i) => ({
+      timer: Math.random() * f.interval, // 随机起始偏移，避免同时喷火
+      active: false
+    }));
   }
 
   /**
@@ -61,6 +69,9 @@ export class Terrain {
     
     // 绘制关卡边界
     this.renderBorders();
+    
+    // 绘制火焰陷阱
+    this.renderFlames();
   }
 
   /**
@@ -260,5 +271,112 @@ export class Terrain {
       };
     }
     return { x: 100, y: 400 };
+  }
+
+  /**
+   * 更新火焰状态（周期性喷火）
+   * @param {number} deltaTime - 时间差
+   */
+  updateFlames(deltaTime) {
+    for (let i = 0; i < this.flames.length; i++) {
+      const flame = this.flames[i];
+      const state = this.flameTimers[i];
+      state.timer += deltaTime;
+      // 周期：duration 时间内喷火，剩余时间熄灭
+      state.active = (state.timer % flame.interval) < flame.duration;
+    }
+  }
+
+  /**
+   * 检查玩家是否碰到火焰
+   * @param {number} playerX - 玩家X坐标（世界坐标）
+   * @param {number} playerY - 玩家Y坐标（底部）
+   * @param {number} playerW - 玩家宽度
+   * @param {number} playerH - 玩家高度
+   * @returns {boolean} 是否碰到火焰
+   */
+  checkFlameCollision(playerX, playerY, playerW, playerH) {
+    const halfW = playerW / 2;
+    const pLeft = playerX - halfW;
+    const pRight = playerX + halfW;
+    const pTop = playerY - playerH;
+    const pBottom = playerY;
+
+    for (let i = 0; i < this.flames.length; i++) {
+      if (!this.flameTimers[i].active) continue;
+      const f = this.flames[i];
+      // AABB 碰撞（玩家与火焰区域）
+      if (pRight > f.x && pLeft < f.x + f.width &&
+          pBottom > f.y - f.height && pTop < f.y) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * 渲染火焰陷阱（周期性喷火动画）
+   */
+  renderFlames() {
+    const now = performance.now() / 1000;
+
+    for (let i = 0; i < this.flames.length; i++) {
+      const flame = this.flames[i];
+      const state = this.flameTimers[i];
+      const screenX = flame.x - this.cameraX;
+
+      // 跳过屏幕外的
+      if (screenX + flame.width < 0 || screenX > this.width) continue;
+
+      // 火焰底部在平台上
+      const baseY = flame.y;
+
+      // --- 火焰喷射口（固定） ---
+      this.ctx.fillStyle = '#555555';
+      this.ctx.fillRect(screenX, baseY - 6, flame.width, 6);
+
+      if (state.active) {
+        // 喷火阶段：绘制火焰柱
+        const flameH = flame.height + 10 * Math.sin(now * 12 + i); // 微抖
+        const cx = screenX + flame.width / 2;
+
+        // 外焰（红色）
+        const grad = this.ctx.createLinearGradient(cx, baseY - flameH, cx, baseY);
+        grad.addColorStop(0, 'rgba(255,60,0,0.2)');
+        grad.addColorStop(0.4, 'rgba(255,120,0,0.7)');
+        grad.addColorStop(1, 'rgba(255,200,0,1)');
+        this.ctx.fillStyle = grad;
+        this.ctx.beginPath();
+        this.ctx.moveTo(screenX - 4, baseY);
+        this.ctx.lineTo(cx, baseY - flameH);
+        this.ctx.lineTo(screenX + flame.width + 4, baseY);
+        this.ctx.closePath();
+        this.ctx.fill();
+
+        // 内焰（黄色/白色）
+        const innerH = flameH * 0.55;
+        this.ctx.fillStyle = 'rgba(255,255,180,0.9)';
+        this.ctx.beginPath();
+        this.ctx.moveTo(screenX + 4, baseY);
+        this.ctx.lineTo(cx, baseY - innerH);
+        this.ctx.lineTo(screenX + flame.width - 4, baseY);
+        this.ctx.closePath();
+        this.ctx.fill();
+
+        // 火花粒子
+        for (let p = 0; p < 3; p++) {
+          const px = cx + Math.sin(now * 8 + p * 2.1 + i) * 8;
+          const py = baseY - flameH * (0.5 + 0.5 * Math.cos(now * 6 + p + i));
+          this.ctx.fillStyle = `rgba(255,${180 + Math.floor(Math.random()*75)},0,0.8)`;
+          this.ctx.fillRect(px - 1, py - 1, 2, 2);
+        }
+      } else {
+        // 冷却阶段：小烟雾提示
+        this.ctx.fillStyle = 'rgba(120,120,120,0.3)';
+        this.ctx.beginPath();
+        this.ctx.arc(screenX + flame.width / 2, baseY - 12, 4, 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+    }
   }
 }

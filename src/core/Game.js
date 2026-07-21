@@ -209,11 +209,27 @@ export class Game {
     // 处理跳跃输入
     this.handleInput();
     
+    // 更新火焰状态
+    this.terrain.updateFlames(deltaTime);
+    
     // 使用物理引擎更新玩家
     const fellOff = this.physics.updatePlayer(this.player, this.input, deltaTime, this.terrain);
     
     // 如果玩家掉落，减少生命值
     if (fellOff) {
+      this.lives--;
+      if (this.lives <= 0) {
+        this.gameState = GameState.GAME_OVER;
+      }
+    }
+    
+    // 检查火焰碰撞（碰到火焰 = 掉坑效果）
+    if (this.terrain.checkFlameCollision(this.player.x, this.player.y, this.player.width, this.player.height)) {
+      this.player.x = this.physics.lastSafeX;
+      this.player.y = this.physics.lastSafeY;
+      this.player.velocityX = 0;
+      this.player.velocityY = 0;
+      this.player.isGrounded = true;
       this.lives--;
       if (this.lives <= 0) {
         this.gameState = GameState.GAME_OVER;

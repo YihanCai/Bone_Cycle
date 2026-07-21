@@ -129,5 +129,47 @@
   "end": {
     "x": 3900,
     "y": 350
-  }
+  },
+  "flames": [
+    {
+      "x": 650,
+      "y": 370,
+      "width": 30,
+      "height": 30,
+      "interval": 2.0,
+      "duration": 1.2
+    },
+    {
+      "x": 1300,
+      "y": 370,
+      "width": 30,
+      "height": 30,
+      "interval": 1.5,
+      "duration": 0.8
+    },
+    {
+      "x": 2000,
+      "y": 350,
+      "width": 40,
+      "height": 30,
+      "interval": 1.8,
+      "duration": 1.0
+    },
+    {
+      "x": 2650,
+      "y": 370,
+      "width": 30,
+      "height": 30,
+      "interval": 2.0,
+      "duration": 1.2
+    },
+    {
+      "x": 3350,
+      "y": 350,
+      "width": 40,
+      "height": 30,
+      "interval": 1.5,
+      "duration": 0.8
+    }
+  ]
 }

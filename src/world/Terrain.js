@@ -19,7 +19,8 @@ export class Terrain {
     this.cameraX = 0;
     
     // 地形颜色
-    this.platformColor = '#4ecdc4';  // 平台颜色（青色）
+    this.grassColor = '#4a7c3f';     // 草地颜色（绿色）
+    this.dirtColor = '#8b5a2b';      // 土地颜色（棕色）
     this.gapColor = '#e94560';       // 坑洞标记颜色（红色）
     this.borderColor = '#ffffff';    // 边框颜色
   }
@@ -72,22 +73,18 @@ export class Terrain {
       
       // 只渲染可见的平台
       if (screenX + platform.width > 0 && screenX < this.width) {
-        // 绘制平台主体
-        this.ctx.fillStyle = this.platformColor;
+        // 绘制土地（地下部分）
+        this.ctx.fillStyle = this.dirtColor;
         this.ctx.fillRect(screenX, platform.y, platform.width, platform.height);
+        
+        // 绘制草地（地面顶部）
+        this.ctx.fillStyle = this.grassColor;
+        this.ctx.fillRect(screenX, platform.y, platform.width, 12);
         
         // 绘制平台边框
         this.ctx.strokeStyle = this.borderColor;
         this.ctx.lineWidth = 2;
         this.ctx.strokeRect(screenX, platform.y, platform.width, platform.height);
-        
-        // 绘制平台顶部装饰线
-        this.ctx.beginPath();
-        this.ctx.moveTo(screenX, platform.y);
-        this.ctx.lineTo(screenX + platform.width, platform.y);
-        this.ctx.strokeStyle = '#ffffff';
-        this.ctx.lineWidth = 3;
-        this.ctx.stroke();
       }
     });
   }
@@ -153,7 +150,7 @@ export class Terrain {
   renderBorders() {
     // 起点边界
     const startScreenX = 0 - this.cameraX;
-    this.ctx.fillStyle = '#4ecdc4';
+    this.ctx.fillStyle = this.dirtColor;
     this.ctx.fillRect(startScreenX, 0, 5, this.height);
     
     // 终点线位置
